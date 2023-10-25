@@ -3,10 +3,12 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
-from .serializers import LoginSerializer, RegistrationSerializer
+from .serializers import LoginSerializer, RegistrationSerializer, UserSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from rest_framework import permissions
+from .models import CustomUser
+from django.db.models.functions import Lower
 
 class LoginView(APIView):
     def post(self, request):
@@ -46,3 +48,11 @@ class LogoutView(APIView):
     def post(self, request):
         Token.objects.filter(user=request.user).delete()
         return Response({"message": "successfully logged out."}, status=status.HTTP_200_OK)
+    
+class UserView(APIView):
+    
+    def get(self, request):
+        users = CustomUser.objects.all().order_by(Lower('user_name'))
+        serializer = UserSerializer(users, many=True)  
+        return Response(serializer.data)
+            
