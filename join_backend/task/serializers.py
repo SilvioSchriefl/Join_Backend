@@ -7,7 +7,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ('email', 'password', 'color', 'initials', 'user_name')
+        fields = ('email', 'password', 'color', 'initials', 'user_name', 'phone')
 
     def create(self, validated_data):
         password = validated_data.pop('password')
@@ -24,7 +24,7 @@ class UserSerializer(serializers.ModelSerializer):
     
    class Meta:
         model = CustomUser
-        fields = ('email', 'color', 'initials', 'user_name', 'id')
+        fields = ('email', 'color', 'initials', 'user_name', 'id', 'phone')
         
 
 

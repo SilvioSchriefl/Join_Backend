@@ -30,6 +30,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     color = models.CharField(max_length=100, default='#00000', blank=True)
     initials = models.CharField(max_length=100, default='', blank=True)
     user_name = models.CharField(max_length=100, default='', blank=True)
+    phone = models.CharField(max_length=100, default='', blank=True)
+    
  
 
     objects = CustomUserManager()
