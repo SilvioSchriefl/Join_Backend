@@ -3,12 +3,14 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
-from .serializers import LoginSerializer, RegistrationSerializer, UserSerializer
+from .serializers import LoginSerializer, RegistrationSerializer, UserSerializer, ContactSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from rest_framework import permissions
-from .models import CustomUser
+from .models import CustomUser, Contact
 from django.db.models.functions import Lower
+from rest_framework.exceptions import NotFound
+
 
 class LoginView(APIView):
     def post(self, request):
@@ -28,6 +30,8 @@ class LoginView(APIView):
             'color': user.color,
             'initials': user.initials,
             'user_name': user.user_name,
+            'phone': user.phone,
+            'contact': user.contact
             }, status=status.HTTP_200_OK)
         
             else:
@@ -50,9 +54,66 @@ class LogoutView(APIView):
         return Response({"message": "successfully logged out."}, status=status.HTTP_200_OK)
     
 class UserView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     
     def get(self, request):
         users = CustomUser.objects.all().order_by(Lower('user_name'))
         serializer = UserSerializer(users, many=True)  
         return Response(serializer.data)
+    
+class ContactView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    def post(self, request):
+        
+        email = request.data.get('email')
+        if CustomUser.objects.filter(email=email).exists() or Contact.objects.filter(email=email).exists():
+            return Response({'email': 'Email already in use'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = ContactSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+class ContactListView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    def get(self, request, ):
+
+        contacts = Contact.objects.all()
+        serializer = ContactSerializer(contacts, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def put(self, request, user_id):
+        email = request.data.get('email')
+        contact = Contact.objects.get(id = user_id)
+        if  contact.email != email:
+            if CustomUser.objects.filter(email=email).exists() or Contact.objects.filter(email=email).exists():
+                return Response({'email': 'Email already in use'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        contact = Contact.objects.get(id=user_id)
+        if contact is None:
+            return Response({'error': 'Kontakt nicht gefunden'}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            serializer = ContactSerializer(contact, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+       
+    def delete(self, user_id):
+        try:
+            contact = Contact.objects.get(id = user_id)
+            contact.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Contact.DoesNotExist:
+            raise NotFound(detail="Todo not found", code=status.HTTP_404_NOT_FOUND) 
+        
+       
+            
+        
+        
+    
             
