@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser, Contact
+from .models import CustomUser, Contact, Category
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -31,6 +31,12 @@ class ContactSerializer(serializers.ModelSerializer):
    class Meta:
         model = Contact
         fields = ('email', 'color', 'initials', 'user_name', 'id', 'phone' ,'contact')
+        
+class CategorySerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Category
+        fields = ('title', 'color', 'id')
         
 
 

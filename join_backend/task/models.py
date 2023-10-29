@@ -41,3 +41,7 @@ class Contact(models.Model):
     user_name = models.CharField(max_length=100, default='', blank=True)
     phone = models.CharField(max_length=100, default='', blank=True)
     contact = models.BooleanField(default=True)
+    
+class Category(models.Model):
+    color = models.CharField(max_length=100, default='#00000', blank=True)
+    title = models.CharField(max_length=100, default='', blank=True)
