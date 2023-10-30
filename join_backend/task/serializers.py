@@ -32,11 +32,13 @@ class ContactSerializer(serializers.ModelSerializer):
         model = Contact
         fields = ('email', 'color', 'initials', 'user_name', 'id', 'phone' ,'contact')
         
+        
 class CategorySerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Category
         fields = ('title', 'color', 'id')
+        
         
 class TaskSerializer(serializers.ModelSerializer):
     custom_users = serializers.PrimaryKeyRelatedField(many=True, queryset=CustomUser.objects.all())

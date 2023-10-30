@@ -78,6 +78,7 @@ class ContactView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     
+    
 class ContactListView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -133,16 +134,20 @@ class CategoryView(APIView):
     def delete(self, request, id):
         category = get_object_or_404(Category, id=id)
         category.delete()
-        return Response({'detail': 'Category successfully deletet.'},status=status.HTTP_204_NO_CONTENT)
+        return Response({'detail': 'Category successfully deleted.'},status=status.HTTP_204_NO_CONTENT)
     
 class TaskView(APIView):
         
     def post(self, request):
+        
         serializer = TaskSerializer(data = request.data)
         if  serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({'detail': 'Task successfully created.', **serializer.data}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+
             
         
         

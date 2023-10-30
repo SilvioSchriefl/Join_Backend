@@ -56,12 +56,14 @@ class Task(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
     contacts = models.ManyToManyField(Contact, related_name='tasks', blank=True)
     custom_users = models.ManyToManyField(CustomUser, related_name='collaborator_tasks', blank=True)
-    subtask_title = models.CharField(max_length=200)
-    subtask_done = models.BooleanField(default=False)
     prio = models.CharField(max_length=50)
+    subtasks = models.JSONField(default=dict)
+    
+    
+    
     
 
-    def __str__(self):
-        return self.title
+
+
 
     
