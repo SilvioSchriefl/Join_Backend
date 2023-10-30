@@ -45,3 +45,23 @@ class Contact(models.Model):
 class Category(models.Model):
     color = models.CharField(max_length=100, default='#00000', blank=True)
     title = models.CharField(max_length=100, default='', blank=True)
+    
+    
+class Task(models.Model):
+    title = models.CharField(max_length=50)
+    description = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+    due_date = models.CharField(max_length=20)
+    status = models.CharField(max_length=20, default='todo', blank=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
+    contacts = models.ManyToManyField(Contact, related_name='tasks', blank=True)
+    custom_users = models.ManyToManyField(CustomUser, related_name='collaborator_tasks', blank=True)
+    subtask_title = models.CharField(max_length=200)
+    subtask_done = models.BooleanField(default=False)
+    prio = models.CharField(max_length=50)
+    
+
+    def __str__(self):
+        return self.title
+
+    

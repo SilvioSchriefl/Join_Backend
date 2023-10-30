@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
-from .serializers import LoginSerializer, RegistrationSerializer, UserSerializer, ContactSerializer, CategorySerializer
+from .serializers import LoginSerializer, RegistrationSerializer, UserSerializer, ContactSerializer, CategorySerializer, TaskSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from rest_framework import permissions
@@ -134,6 +134,17 @@ class CategoryView(APIView):
         category = get_object_or_404(Category, id=id)
         category.delete()
         return Response({'detail': 'Category successfully deletet.'},status=status.HTTP_204_NO_CONTENT)
+    
+class TaskView(APIView):
+        
+    def post(self, request):
+        serializer = TaskSerializer(data = request.data)
+        if  serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+        
         
         
         

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser, Contact, Category
+from .models import CustomUser, Contact, Category, Task
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -38,5 +38,13 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = ('title', 'color', 'id')
         
+class TaskSerializer(serializers.ModelSerializer):
+    custom_users = serializers.PrimaryKeyRelatedField(many=True, queryset=CustomUser.objects.all())
+    contacts = serializers.PrimaryKeyRelatedField(many=True, queryset=Contact.objects.all())
+    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all())  # Korrekte Verwendung von Category
+
+    class Meta:
+        model = Task
+        fields = '__all__'
 
 
