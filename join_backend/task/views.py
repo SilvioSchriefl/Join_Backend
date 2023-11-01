@@ -32,7 +32,7 @@ class LoginView(APIView):
             'initials': user.initials,
             'user_name': user.user_name,
             'phone': user.phone,
-            'contact': user.contact
+            'user_contact': user.contact
             }, status=status.HTTP_200_OK)
         
             else:
@@ -71,6 +71,8 @@ class ContactView(APIView):
         email = request.data.get('email')
         if CustomUser.objects.filter(email=email).exists() or Contact.objects.filter(email=email).exists():
             return Response({'email': 'Email already in use'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        request.data['created_by'] = request.user.id
         serializer = ContactSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -82,15 +84,18 @@ class ContactView(APIView):
 class ContactListView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    def get(self, request, user_id=None ):
+    def get(self, request, contact_id=None ):
 
         contacts = Contact.objects.all()
         serializer = ContactSerializer(contacts, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
-    def put(self, request, user_id):
+    
+class EditContactView(APIView):
+    
+    def put(self, request, contact_id):
         email = request.data.get('email')
-        contact = Contact.objects.get(id = user_id)
+        contact = Contact.objects.get(id = contact_id)
         if  contact.email != email:
             if CustomUser.objects.filter(email=email).exists() or Contact.objects.filter(email=email).exists():
                 return Response({'email': 'Email already in use'}, status=status.HTTP_400_BAD_REQUEST)
@@ -103,12 +108,14 @@ class ContactListView(APIView):
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-       
-   
-    def delete(self, user_id):
-        contact = get_object_or_404(Contact, id=user_id)
+    
+class DeleteContactView(APIView):
+
+
+    def delete(self, request, contact_id):
+        contact = get_object_or_404(Contact, id=contact_id)
         contact.delete()
-        return Response({'detail': 'Contact successfully deletet.'},status=status.HTTP_204_NO_CONTENT)
+        return Response({'detail': 'Contact successfully deleted.'}, status=status.HTTP_204_NO_CONTENT)
     
 
 class CategoryView(APIView):

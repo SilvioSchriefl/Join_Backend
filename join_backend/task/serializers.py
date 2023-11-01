@@ -7,7 +7,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ('email', 'password', 'color', 'initials', 'user_name', 'phone', 'contact')
+        fields = ('email', 'password', 'color', 'initials', 'user_name', 'phone', 'user_contact')
 
     def create(self, validated_data):
         password = validated_data.pop('password')
@@ -24,13 +24,14 @@ class UserSerializer(serializers.ModelSerializer):
     
    class Meta:
         model = CustomUser
-        fields = ('email', 'color', 'initials', 'user_name', 'id', 'phone', 'contact')
+        fields = ('email', 'color', 'initials', 'user_name', 'id', 'phone', 'user_contact')
         
 class ContactSerializer(serializers.ModelSerializer):
     
-   class Meta:
+    created_by = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all())
+    class Meta:
         model = Contact
-        fields = ('email', 'color', 'initials', 'user_name', 'id', 'phone' ,'contact')
+        fields = ('email', 'color', 'initials', 'user_name', 'id', 'phone' ,'user_contact', 'created_by')
         
         
 class CategorySerializer(serializers.ModelSerializer):

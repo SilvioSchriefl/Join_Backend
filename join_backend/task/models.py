@@ -29,7 +29,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     initials = models.CharField(max_length=100, default='', blank=True)
     user_name = models.CharField(max_length=100, default='', blank=True)
     phone = models.CharField(max_length=100, default='', blank=True)
-    contact = models.BooleanField(default=False)
+    user_contact = models.BooleanField(default=False)
     objects = CustomUserManager()
     USERNAME_FIELD = 'email'
     
@@ -40,7 +40,8 @@ class Contact(models.Model):
     initials = models.CharField(max_length=100, default='', blank=True)
     user_name = models.CharField(max_length=100, default='', blank=True)
     phone = models.CharField(max_length=100, default='', blank=True)
-    contact = models.BooleanField(default=True)
+    user_contact = models.BooleanField(default=True)
+    created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE,  default=1)
     
 class Category(models.Model):
     color = models.CharField(max_length=100, default='#00000', blank=True)
@@ -49,14 +50,14 @@ class Category(models.Model):
     
 class Task(models.Model):
     title = models.CharField(max_length=50)
-    description = models.CharField(max_length=50)
+    description = models.CharField(max_length=50, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     due_date = models.CharField(max_length=20)
     status = models.CharField(max_length=20, default='todo', blank=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
     contacts = models.ManyToManyField(Contact, related_name='tasks', blank=True)
     custom_users = models.ManyToManyField(CustomUser, related_name='collaborator_tasks', blank=True)
-    prio = models.CharField(max_length=50)
+    prio = models.CharField(max_length=50, blank=True)
     subtasks = models.JSONField(default=dict)
     
     
