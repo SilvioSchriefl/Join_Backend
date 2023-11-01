@@ -41,11 +41,15 @@ class Contact(models.Model):
     user_name = models.CharField(max_length=100, default='', blank=True)
     phone = models.CharField(max_length=100, default='', blank=True)
     user_contact = models.BooleanField(default=True)
-    created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE,  default=1)
+    created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE,  default=1, blank=True)
+    
+    def get_title(self):
+        return self.user_name
     
 class Category(models.Model):
     color = models.CharField(max_length=100, default='#00000', blank=True)
     title = models.CharField(max_length=100, default='', blank=True)
+    
     
     
 class Task(models.Model):
@@ -54,7 +58,8 @@ class Task(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     due_date = models.CharField(max_length=20)
     status = models.CharField(max_length=20, default='todo', blank=True)
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
+    category_title = models.CharField(max_length=50, blank=True)
+    category_color = models.CharField(max_length=50, blank=True)
     contacts = models.ManyToManyField(Contact, related_name='tasks', blank=True)
     custom_users = models.ManyToManyField(CustomUser, related_name='collaborator_tasks', blank=True)
     prio = models.CharField(max_length=50, blank=True)

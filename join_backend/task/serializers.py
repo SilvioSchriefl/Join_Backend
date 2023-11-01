@@ -36,6 +36,7 @@ class ContactSerializer(serializers.ModelSerializer):
         
 class CategorySerializer(serializers.ModelSerializer):
     
+    
     class Meta:
         model = Category
         fields = ('title', 'color', 'id')
@@ -44,7 +45,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class TaskSerializer(serializers.ModelSerializer):
     custom_users = serializers.PrimaryKeyRelatedField(many=True, queryset=CustomUser.objects.all())
     contacts = serializers.PrimaryKeyRelatedField(many=True, queryset=Contact.objects.all())
-    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all())  # Korrekte Verwendung von Category
+    
 
     class Meta:
         model = Task
