@@ -155,6 +155,18 @@ class TaskView(APIView):
         tasks = Task.objects.all()
         serializer = TaskSerializer(tasks, many=True)  
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def patch(self, request):
+        try:
+            task = Task.objects.get(id=request.data.get('id')  )
+        except Task.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = TaskSerializer(task, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
         
         
     
