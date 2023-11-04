@@ -60,8 +60,7 @@ class Task(models.Model):
     status = models.CharField(max_length=20, default='todo', blank=True)
     category_title = models.CharField(max_length=50, blank=True)
     category_color = models.CharField(max_length=50, blank=True)
-    contacts = models.ManyToManyField(Contact, related_name='tasks', blank=True)
-    custom_users = models.ManyToManyField(CustomUser, related_name='collaborator_tasks', blank=True)
+    assigned_emails = models.JSONField(default=dict)
     prio = models.CharField(max_length=50, blank=True)
     subtasks = models.JSONField(default=dict)
     
