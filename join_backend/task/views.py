@@ -121,7 +121,7 @@ class CategoryView(APIView):
         
         title = request.data.get('title')
         if Category.objects.filter(title=title).exists():
-            return Response({'detail': 'Title already exist'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail': 'Title already exists'}, status=status.HTTP_400_BAD_REQUEST)
         
         serializer = CategorySerializer(data = request.data)
         if serializer.is_valid():
@@ -166,6 +166,12 @@ class TaskView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, id):
+        task = get_object_or_404(Task, id=id)
+        task.delete()
+        return Response({'detail': 'Task successfully deleted.'},status=status.HTTP_204_NO_CONTENT)
+        
 
         
         

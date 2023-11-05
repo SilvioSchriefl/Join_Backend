@@ -49,6 +49,7 @@ class Contact(models.Model):
 class Category(models.Model):
     color = models.CharField(max_length=100, default='#00000', blank=True)
     title = models.CharField(max_length=100, default='', blank=True)
+    creator_email = models.EmailField(max_length=70, default='', blank=True)
     
     
     

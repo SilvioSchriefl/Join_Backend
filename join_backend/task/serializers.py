@@ -39,7 +39,7 @@ class CategorySerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Category
-        fields = ('title', 'color', 'id')
+        fields = ('title', 'color', 'id', 'creator_email')
         
         
 class TaskSerializer(serializers.ModelSerializer):
