@@ -32,7 +32,7 @@ class LoginView(APIView):
             'initials': user.initials,
             'user_name': user.user_name,
             'phone': user.phone,
-            'user_contact': user.contact
+            'user_contact': user.user_contact
             }, status=status.HTTP_200_OK)
         
             else:
