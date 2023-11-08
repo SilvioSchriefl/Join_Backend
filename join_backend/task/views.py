@@ -144,6 +144,10 @@ class TaskView(APIView):
         
     def post(self, request):
         
+        title = request.data.get('title')
+        if Task.objects.filter(title=title).exists():
+            return Response({'detail': 'Title already exists'}, status=status.HTTP_400_BAD_REQUEST)
+        
         serializer = TaskSerializer(data = request.data)
         if  serializer.is_valid():
             serializer.save()
