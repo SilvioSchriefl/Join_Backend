@@ -104,7 +104,7 @@ class EditContactView(APIView):
 class DeleteContactView(APIView):
 
 
-    def delete(self, contact_id):
+    def delete(self, request, contact_id):
         contact = get_object_or_404(Contact, id=contact_id)
         contact.delete()
         return Response({'detail': 'Contact successfully deleted.'}, status=status.HTTP_204_NO_CONTENT)
@@ -112,7 +112,7 @@ class DeleteContactView(APIView):
 
 class CategoryView(APIView):
     
-    def post(self, request):
+    def post(self,  request):
         
         title = request.data.get('title')
         if Category.objects.filter(title=title).exists():
