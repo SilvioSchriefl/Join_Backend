@@ -85,7 +85,7 @@ class ContactView(APIView):
     
 class EditContactView(APIView):
     
-    def put(self, contact_id):
+    def put(self, request, contact_id):
         email = request.data.get('email')
         contact = Contact.objects.get(id = contact_id)
         if  contact.email != email:
