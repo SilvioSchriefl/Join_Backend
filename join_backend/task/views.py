@@ -54,8 +54,7 @@ class LogoutView(APIView):
         return Response({"message": "successfully logged out."}, status=status.HTTP_200_OK)
     
 class UserView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+  
     
     def get(self, request):
         users = CustomUser.objects.all().order_by(Lower('user_name'))
@@ -77,10 +76,6 @@ class ContactView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    
-    
-class ContactListView(APIView):
-
     def get(self, request, contact_id=None ):
 
         contacts = Contact.objects.all()
@@ -90,7 +85,7 @@ class ContactListView(APIView):
     
 class EditContactView(APIView):
     
-    def put(self, request, contact_id):
+    def put(self, contact_id):
         email = request.data.get('email')
         contact = Contact.objects.get(id = contact_id)
         if  contact.email != email:
@@ -109,7 +104,7 @@ class EditContactView(APIView):
 class DeleteContactView(APIView):
 
 
-    def delete(self, request, contact_id):
+    def delete(self, contact_id):
         contact = get_object_or_404(Contact, id=contact_id)
         contact.delete()
         return Response({'detail': 'Contact successfully deleted.'}, status=status.HTTP_204_NO_CONTENT)

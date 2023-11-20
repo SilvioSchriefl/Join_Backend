@@ -26,7 +26,8 @@ SECRET_KEY = 'django-insecure-p7(uhn6@pqq3*r6+gfxy*l6le6yy%(#c0=x3ybq8%&b%=&1q@e
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'ftpobi.pythonanywhere.com'
+    'ftpobi.pythonanywhere.com',
+    '127.0.0.1'
 ]
 
 

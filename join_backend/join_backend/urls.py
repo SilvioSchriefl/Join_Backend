@@ -1,7 +1,7 @@
 
 from django.contrib import admin
 from django.urls import path
-from task.views import LoginView, RegisterView, LogoutView, UserView, ContactView, ContactListView, CategoryView, TaskView, DeleteContactView, EditContactView
+from task.views import LoginView, RegisterView, LogoutView, UserView, ContactView, CategoryView, TaskView, DeleteContactView, EditContactView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -9,8 +9,7 @@ urlpatterns = [
     path('sign_up/', RegisterView.as_view(), name='register'),
     path('log_out/', LogoutView.as_view(), name='logout'),
     path('users/', UserView.as_view(), name='users'),
-    path('add_contact/', ContactView.as_view(), name='add_contact'),
-    path('contacts/', ContactListView.as_view(), name='contacts'),
+    path('contacts/', ContactView.as_view(), name='add_contact'),
     path('edit_contact/<int:contact_id>/', EditContactView.as_view(), name='edit_contacts'),
     path('delete_contact/<int:contact_id>/', DeleteContactView.as_view(), name='delete_contact'),
     path('category/', CategoryView.as_view(), name='category'),
