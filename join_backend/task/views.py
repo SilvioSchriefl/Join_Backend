@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, logout
 from .serializers import LoginSerializer, RegistrationSerializer, UserSerializer, ContactSerializer, CategorySerializer, TaskSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
@@ -44,18 +44,22 @@ class RegisterView(APIView):
         serializer = RegistrationSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            return Response({'detail': 'User successfull created'}, status=status.HTTP_201_CREATED)
+            return Response({'detail': 'User successfully created'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class LogoutView(APIView):
 
     def post(self, request):
-        Token.objects.filter(user=request.user).delete()
-        return Response({"message": "successfully logged out."}, status=status.HTTP_200_OK)
+        if request.user.is_authenticated:
+            Token.objects.filter(user=request.user).delete()
+            logout(request)
+            return Response({"message": "successfully logged out."}, status=status.HTTP_200_OK)
+        else:
+            return Response({"detail": "Authentication credentials were not provided."},
+                            status=status.HTTP_401_UNAUTHORIZED)
     
 class UserView(APIView):
   
-    
     def get(self, request):
         users = CustomUser.objects.all().order_by(Lower('user_name'))
         serializer = UserSerializer(users, many=True)  
@@ -63,12 +67,11 @@ class UserView(APIView):
     
 class ContactView(APIView):
 
-    def post(self, request):
-        
+    def post(self, request): 
         email = request.data.get('email')
         if CustomUser.objects.filter(email=email).exists() or Contact.objects.filter(email=email).exists():
             return Response({'email': 'Email already in use'}, status=status.HTTP_400_BAD_REQUEST)
-        
+   
         request.data['created_by'] = request.user.id
         serializer = ContactSerializer(data=request.data)
         if serializer.is_valid():
@@ -77,7 +80,6 @@ class ContactView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def get(self, request, contact_id=None ):
-
         contacts = Contact.objects.all()
         serializer = ContactSerializer(contacts, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -87,22 +89,21 @@ class EditContactView(APIView):
     
     def put(self, request, contact_id):
         email = request.data.get('email')
-        contact = Contact.objects.get(id = contact_id)
+        try:
+            contact = Contact.objects.get(id=contact_id)
+        except Contact.DoesNotExist:
+            return Response({'error': 'Contact not found'}, status=status.HTTP_404_NOT_FOUND)
         if  contact.email != email:
             if CustomUser.objects.filter(email=email).exists() or Contact.objects.filter(email=email).exists():
                 return Response({'email': 'Email already in use'}, status=status.HTTP_400_BAD_REQUEST)
         
-        if contact is None:
-            return Response({'error': 'Contact not found'}, status=status.HTTP_404_NOT_FOUND)
-        else:
-            serializer = ContactSerializer(contact, data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer = ContactSerializer(contact, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class DeleteContactView(APIView):
-
 
     def delete(self, request, contact_id):
         contact = get_object_or_404(Contact, id=contact_id)
@@ -113,11 +114,9 @@ class DeleteContactView(APIView):
 class CategoryView(APIView):
     
     def post(self,  request):
-        
         title = request.data.get('title')
         if Category.objects.filter(title=title).exists():
             return Response({'detail': 'Title already exists'}, status=status.HTTP_400_BAD_REQUEST)
-        
         serializer = CategorySerializer(data = request.data)
         if serializer.is_valid():
             serializer.save()
@@ -125,7 +124,6 @@ class CategoryView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def get(self, request):
-        
         categorys = Category.objects.all()
         serializer = CategorySerializer(categorys, many=True)  
         return Response(serializer.data)
@@ -138,11 +136,9 @@ class CategoryView(APIView):
 class TaskView(APIView):
         
     def post(self, request):
-        
         title = request.data.get('title')
         if Task.objects.filter(title=title).exists():
             return Response({'detail': 'Title already exists'}, status=status.HTTP_400_BAD_REQUEST)
-        
         serializer = TaskSerializer(data = request.data)
         if  serializer.is_valid():
             serializer.save()
@@ -150,7 +146,6 @@ class TaskView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def get(self, request):
-        
         tasks = Task.objects.all()
         serializer = TaskSerializer(tasks, many=True)  
         return Response(serializer.data, status=status.HTTP_200_OK)
