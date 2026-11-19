@@ -186,6 +186,11 @@ class DeleteContactViewTest(TestCase):
         self.assertEqual(response.data['detail'], 'Not found.')
         
 class CategoryViewTest(TestCase):
+    def setUp(self):
+        self.user = CustomUser.objects.create_user(user_name='testuser', email='test@example.com', password='testpassword')
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+
     def test_post_category(self):
         data = {'title': 'New Category'}
         response = self.client.post(reverse('category'), data, format='json')
@@ -224,6 +229,9 @@ class CategoryViewTest(TestCase):
         
 class TaskViewTest(TestCase):
     def setUp(self):
+        self.user = CustomUser.objects.create_user(user_name='testuser', email='test@example.com', password='testpassword')
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
         Task.objects.create(title='Test Task 1')
 
     def test_create_task(self):
@@ -243,7 +251,7 @@ class TaskViewTest(TestCase):
         existing_task = Task.objects.first()
         url = reverse('task')
         data = {'id': existing_task.id, 'title': 'Updated Task'}
-        response = self.client.patch(url, data, content_type='application/json')
+        response = self.client.patch(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         existing_task.refresh_from_db()
         self.assertEqual(existing_task.title, 'Updated Task')
@@ -255,3 +263,25 @@ class TaskViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Task.objects.count(), 0)
 
+
+class AnonymousAccessTest(TestCase):
+    """Ohne Login darf man nur sich registrieren und anmelden – sonst nichts lesen oder ändern."""
+
+    def setUp(self):
+        self.client = APIClient()
+        CustomUser.objects.create_user(user_name='user1', email='user1@example.com', password='password1')
+        self.task = Task.objects.create(title='Geheim')
+
+    def test_anonymous_cannot_read_data(self):
+        for name in ['users', 'contacts', 'task', 'category']:
+            response = self.client.get(reverse(name))
+            self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED, name)
+
+    def test_anonymous_cannot_delete_task(self):
+        response = self.client.delete(reverse('delete_task', args=[self.task.id]))
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertTrue(Task.objects.filter(id=self.task.id).exists())
+
+    def test_anonymous_can_still_log_in(self):
+        response = self.client.post(reverse('get_token'), {'email': 'user1@example.com', 'password': 'password1'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

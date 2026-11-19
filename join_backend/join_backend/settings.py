@@ -21,10 +21,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-p7(uhn6@pqq3*r6+gfxy*l6le6yy%(#c0=x3ybq8%&b%=&1q@e'
+# Der echte Schlüssel kommt aus der Umgebungsvariable DJANGO_SECRET_KEY.
+# Der Ersatzwert ist nur für die lokale Entwicklung gedacht.
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'unsicher-nur-fuer-lokale-entwicklung')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = [
     'ftpobi.pythonanywhere.com',
@@ -133,6 +135,10 @@ CORS_ALLOWED_ORIGINS = ['http://localhost:4200', 'http://localhost:58185', 'http
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
+    ],
+    # Standard: nur angemeldete Nutzer. Login und Registrierung sind ausdrücklich freigegeben.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
     ],
 }
 AUTH_USER_MODEL = 'task.CustomUser'
