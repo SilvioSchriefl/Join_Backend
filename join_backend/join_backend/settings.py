@@ -28,9 +28,9 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'unsicher-nur-fuer-lokale-entwi
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = [
-    'ftpobi.pythonanywhere.com',
-    '127.0.0.1'
+# Kommagetrennt aus der Umgebung, z. B. "silvio.pythonanywhere.com"
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] + [
+    host.strip() for host in os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',') if host.strip()
 ]
 
 
@@ -39,6 +39,7 @@ ALLOWED_HOSTS = [
 INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_framework',
+    'corsheaders',
     'task',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -131,7 +132,11 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-CORS_ALLOWED_ORIGINS = ['http://localhost:4200', 'http://localhost:58185', 'http://localhost:58417', 'https://join.silvio-schriefl.de']
+# Frontends, die die API aufrufen dürfen. Kommagetrennt aus der Umgebung,
+# z. B. "https://join-silvio.pages.dev"
+CORS_ALLOWED_ORIGINS = ['http://localhost:4200'] + [
+    origin.strip() for origin in os.environ.get('DJANGO_CORS_ORIGINS', '').split(',') if origin.strip()
+]
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
