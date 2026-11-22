@@ -285,3 +285,13 @@ class AnonymousAccessTest(TestCase):
     def test_anonymous_can_still_log_in(self):
         response = self.client.post(reverse('get_token'), {'email': 'user1@example.com', 'password': 'password1'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+class CreateGuestCommandTest(TestCase):
+    def test_creates_guest_once_and_guest_can_log_in(self):
+        from django.core.management import call_command
+        call_command('create_guest')
+        call_command('create_guest')
+        self.assertEqual(CustomUser.objects.filter(email='guest@guest.com').count(), 1)
+        response = APIClient().post(reverse('get_token'), {'email': 'guest@guest.com', 'password': '123'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
